@@ -7,7 +7,10 @@ using namespace std;
 
 int main()
 {
-    PointCloud pc = PointCloud();
+    auto init = PointCloudInitializerUniform();
+    auto pc = PointCloud::CreatePointCloud(init);
+
+    pc->display(cout);
 
     Point a{0.0, 2.0};
     Point b(a);
