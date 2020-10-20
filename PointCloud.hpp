@@ -46,6 +46,9 @@ struct Point
  */
 using PointArray = vector<Point>;
 
+/**
+ * PointCloud initializer base class
+ */
 class PointCloudInitializer
 {
 public:
@@ -59,7 +62,7 @@ public:
 };
 
 /**
- * Cloud point initialization algorithm
+ * PointCloud initialization algorithm using uniform distribution
  */
 class PointCloudInitializerUniform : public PointCloudInitializer
 {
@@ -119,13 +122,22 @@ private:
 class PointCloud
 {
 public:
+    /**
+     * shared pointer type definition
+     */ 
     typedef shared_ptr<PointCloud> PointCloudPtr;
 
+    /**
+     * Factory method to create a new point cloud using specified initializer
+     */
     static PointCloudPtr CreatePointCloud(PointCloudInitializer& init)
     {
         return make_shared<PointCloud>(init);
     }
 
+    /**
+     * PointCloud  constructor
+     */
     PointCloud(PointCloudInitializer& init)
     {
         _points.resize(init.len());
@@ -133,6 +145,9 @@ public:
         for_each(_points.begin(), _points.end(), std::ref(init));
     }
 
+    /**
+     * Dump internal points array into provided output stream
+     */
     void display(ostream& stream)
     {
         auto print = [&stream](Point& p) { stream << p.x << " " << p.y << endl; };
@@ -143,6 +158,53 @@ public:
 private:
 
     PointArray _points;
+};
+
+/**
+ * Class representing extracted convex hull,
+ * provided a corresponding point cloud
+ */
+class ConvexHull
+{
+public:
+
+    /**
+     * shared pointer type definition
+     */
+    typedef shared_ptr<ConvexHull> ConvexHullPtr;
+
+    /**
+     * Factory method to create a new convex hull out of a point cloud
+     */
+    static ConvexHullPtr CreateConvexHull(PointCloud::PointCloudPtr points)
+    {
+        return make_shared<ConvexHull>(points);
+    }
+
+    /**
+     * ConvexHull constructor
+     */
+    ConvexHull(PointCloud::PointCloudPtr points) {}
+
+    /**
+     * Query the number of element that compose the hull
+     */
+    uint64_t getNbElements(void)
+    {
+        return _hull.size();
+    }
+
+    /**
+     * Query the final length of the perimeter delimited by the hull
+     */
+    double getPerimeter(void)
+    {
+        return 0.0;
+    }
+
+private:
+
+    PointArray _hull;
 };
 
 } // namespace Cloud
