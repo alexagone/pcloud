@@ -46,11 +46,22 @@ struct Point
  */
 using PointArray = vector<Point>;
 
+class PointCloudInitializer
+{
+public:
+    virtual ~PointCloudInitializer() {}
+
+    virtual inline uint64_t len(void) { return 0; };
+    virtual inline void gen(Point& p) { p.x = 0.0; p.y = 0.0; };
+
+    void operator()(Point& p) { gen(p); };
+
+};
 
 /**
  * Cloud point initialization algorithm
  */
-class PointCloudInitializerUniform
+class PointCloudInitializerUniform : public PointCloudInitializer
 {
 public:
 
@@ -78,12 +89,12 @@ public:
     {
     }
 
-    inline uint64_t len(void)
+    virtual inline uint64_t len(void)
     {
         return _M;
     }
 
-    void operator()(Point& p)
+    virtual inline void gen(Point& p)
     {
         p.x = _distx(_mt); p.y = _disty(_mt);
     }
@@ -110,16 +121,16 @@ class PointCloud
 public:
     typedef shared_ptr<PointCloud> PointCloudPtr;
 
-    static PointCloudPtr CreatePointCloud(PointCloudInitializerUniform& init)
+    static PointCloudPtr CreatePointCloud(PointCloudInitializer& init)
     {
-        return PointCloudPtr(new PointCloud(init));
+        return make_shared<PointCloud>(init);
     }
 
-    PointCloud(PointCloudInitializerUniform& init)
+    PointCloud(PointCloudInitializer& init)
     {
         _points.resize(init.len());
 
-        for_each(_points.begin(), _points.end(), init);
+        for_each(_points.begin(), _points.end(), std::ref(init));
     }
 
     void display(ostream& stream)
