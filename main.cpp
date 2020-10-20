@@ -1,6 +1,7 @@
 #include "PointCloud.hpp"
 
 #include <iostream>
+#include <fstream>
 
 using namespace Cloud;
 using namespace std;
@@ -10,7 +11,8 @@ int main()
     auto init = PointCloudInitializerUniform();
     auto pc = PointCloud::CreatePointCloud(init);
 
-    pc->display(cout);
+    auto fcloud = ofstream("/tmp/cloud.csv");
+    pc->write(fcloud);
 
     Point a{0.0, 2.0};
     Point b(a);

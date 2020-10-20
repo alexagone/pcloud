@@ -148,7 +148,7 @@ public:
     /**
      * Dump internal points array into provided output stream
      */
-    void display(ostream& stream)
+    void write(ostream& stream)
     {
         auto print = [&stream](Point& p) { stream << p.x << " " << p.y << endl; };
 
