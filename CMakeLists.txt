@@ -7,6 +7,10 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -march=native")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 
-add_subdirectory(third)
+
+if(EXISTS "${CMAKE_SOURCE_DIR}/third/googletest")
+    add_subdirectory(third)
+    add_subdirectory(test)
+endif()
+
 add_subdirectory(src)
-add_subdirectory(test)
