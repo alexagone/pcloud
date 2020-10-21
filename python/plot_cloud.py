@@ -20,6 +20,9 @@ def main():
     ax.scatter(cloud[:,0], cloud[:,1])
     ax.scatter(hull[:,0], hull[:,1])
 
+    for i, txt in enumerate(range(len(hull))): # .shape[0])):
+        ax.annotate(txt, (hull[:,0][i], hull[:,1][i]))
+
     plt.show()
 
 if __name__ == "__main__":

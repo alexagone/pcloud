@@ -73,8 +73,22 @@ TEST(TestComplexHull, TestTrivialCase)
     auto pc = make_shared<PointCloud>(pa);
 
     QuickHull qh;
-    qh(pc);
+    auto hull = qh(pc);
 
     EXPECT_EQ(qh.getXminIndex(), 5);
     EXPECT_EQ(qh.getXmaxIndex(), 1);
+
+    Point p0{0.78, 0.54};
+    Point p1{0.28, 0.52};
+    Point p2{0.33, 0.63};
+    Point p3{0.59, 0.61};
+
+    EXPECT_EQ(hull[0].x, p0.x);
+    EXPECT_EQ(hull[0].y, p0.y);
+    EXPECT_EQ(hull[1].x, p1.x);
+    EXPECT_EQ(hull[1].y, p1.y);
+    EXPECT_EQ(hull[2].x, p2.x);
+    EXPECT_EQ(hull[2].y, p2.y);
+    EXPECT_EQ(hull[3].x, p3.x);
+    EXPECT_EQ(hull[3].y, p3.y);
 }

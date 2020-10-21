@@ -12,6 +12,10 @@ using namespace std;
 
 namespace Cloud {
 
+/**
+ * Define PI for further computation
+ */
+constexpr double pi() { return std::atan(1)*4; }
 
 /**
  * 2d point coordinate
@@ -51,6 +55,21 @@ struct Point
     double y; 
 };
 
+/**
+ * Define a binary minus operation for Point class
+ */
+Point operator-(const Point& lh, const Point& rh)
+{
+    return Point{lh.x-rh.x, lh.y-rh.y};
+}
+
+/**
+ * Define comparison operator
+ */
+bool operator==(const Point& lh, const Point& rh)
+{
+    return (lh.x == lh.y) && (rh.x == rh.y);
+}
 
 /**
  * A dynamically allocated contiguous array of Point
@@ -89,6 +108,47 @@ double distanceToLine2D(const Point& P1, const Point& P2, const Point& C)
     return num / det;
 }
 
+class SortClockwise
+{
+public:
+    SortClockwise(PointArray& pa) : _center{0.0, 0.0}
+    {
+        // compute the center position of the provided PointArray
+        for(auto& p : pa) {
+            _center.x += p.x;
+            _center.y += p.y;
+        }
+
+        _center.x /= (double)pa.size();
+        _center.y /= (double)pa.size();
+    }
+
+    bool operator()(const Point& r, const Point& l)
+    {
+        rr = r - _center;
+        ll = l - _center;
+
+        return _get_angle(rr) > _get_angle(ll);
+    }
+
+private:
+
+    double _get_angle(Point& p)
+    {
+        if(p.y >= 0.0)
+            return atan2(p.y, p.x);
+        else
+            return 2*pi() + atan2(p.y, p.x);
+    }
+
+    Point _center;
+    Point rr;
+    Point ll;
+};
+
+/**
+ * Side definition, used to determine if points are right or left from a reference position
+ */ 
 typedef enum {
     SIDE_RIGHT = 0,
     SIDE_LEFT = 1,
@@ -256,11 +316,11 @@ class ConvexHullAlgo
 {
 public:
 
-    PointSet operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
 private:
 
-    virtual PointSet _process(PointCloud::PointCloudPtr& points) { return PointSet(); }
+    virtual PointArray _process(PointCloud::PointCloudPtr& points) { return PointArray(); }
 };
 
 
@@ -273,37 +333,40 @@ public:
 
     QuickHull() : _hull() {}
 
-    PointSet operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
     inline uint64_t getXminIndex(void) { return _xmin; }
     inline uint64_t getXmaxIndex(void) { return _xmax; }
 
 private:
 
-    virtual PointSet _process(PointCloud::PointCloudPtr& points)
+    virtual PointArray _process(PointCloud::PointCloudPtr& points)
     {
-        _pa = points->getPointArray();
+        PointArray pa = points->getPointArray();
 
         // determine the min and max value over x axis
-        uint64_t n = _pa.size();
+        uint64_t n = pa.size();
         for(uint64_t i = 1; i < n; ++i)
         {
-            if(_pa[i].x < _pa[_xmin].x) {
+            if(pa[i].x < pa[_xmin].x) {
                 _xmin = i;
             }
-            if(_pa[i].x > _pa[_xmax].x) {
+            if(pa[i].x > pa[_xmax].x) {
                 _xmax = i;
             }
         }
 
         // process recursively each side of the segment created by xmin, xmax
-        _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_RIGHT);
-        _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_LEFT);
+        _processRecurse(pa, pa[_xmin], pa[_xmax], SIDE_RIGHT);
+        _processRecurse(pa, pa[_xmin], pa[_xmax], SIDE_LEFT);
 
-        return _hull;
+        // sort the final result
+        _sortClockWise();
+
+        return _hullSorted;
     }
 
-    void _processRecurse(const Point& P1, const Point& P2, int side)
+    void _processRecurse(PointArray& pa, const Point& P1, const Point& P2, int side)
     {
         // index of most distant point from point array
         int i = 0;
@@ -328,7 +391,7 @@ private:
 
             ++i;
         };
-        for_each(_pa.begin(), _pa.end(), findFurthest);
+        for_each(pa.begin(), pa.end(), findFurthest);
 
         // Stop condition for the recursion
         // Correspond to the condition where both Points are part of the convex hull
@@ -340,12 +403,23 @@ private:
 
         // 1. recursively process the right/left side of the segment for both segment
         //    (P1, P0)  and  (P0, P2)
-        _processRecurse(_pa[index], P1, determineSide2D(_pa[index], P2, P1));
-        _processRecurse(_pa[index], P2, determineSide2D(_pa[index], P1, P2));
+        _processRecurse(pa, pa[index], P1, determineSide2D(pa[index], P2, P1));
+        _processRecurse(pa, pa[index], P2, determineSide2D(pa[index], P1, P2));
     }
 
-    PointArray _pa;
+    /**
+     * Sort hull Point contained inside the PointArray
+     */
+    void _sortClockWise(void)
+    {
+        copy(_hull.begin(), _hull.end(), back_inserter(_hullSorted));
+
+        SortClockwise sortClockwise(_hullSorted);
+        sort(_hullSorted.begin(), _hullSorted.end(), sortClockwise);
+    }
+
     PointSet _hull;
+    PointArray _hullSorted;
 
     uint64_t _xmin = 0;
     uint64_t _xmax = 0;
@@ -410,7 +484,7 @@ public:
 
 private:
 
-    PointSet _hull;
+    PointArray _hull;
 };
 
 } // namespace Cloud
