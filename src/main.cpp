@@ -14,11 +14,5 @@ int main()
     auto fcloud = ofstream("/tmp/cloud.csv");
     pc->write(fcloud);
 
-    Point a{0.0, 2.0};
-    Point b(a);
-    Point c = b;
-    cout << b.x << " " << b.y << endl;
-    cout << c.x << " " << c.y << endl;
-
     return 0;
 }
