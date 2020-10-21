@@ -38,11 +38,11 @@ TEST(TestPoint, TestSegmentSide)
     Point p1{0.0, 4.0};
     Point p2{4.0, 0.0};
 
-    Point pright{1.0, 1.0};
-    Point pleft{3.0, 3.0};
+    Point pleft{1.0, 1.0};
+    Point pright{3.0, 3.0};
 
-    EXPECT_EQ(determineSide2D(p1, p2, pright), SIDE_RIGHT);
-    EXPECT_EQ(determineSide2D(p1, p2, pleft), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(p1, p2, pright), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(p1, p2, pleft), SIDE_RIGHT);
 }
 
 TEST(TestPointCloud, TestInitialization)

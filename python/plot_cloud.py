@@ -9,13 +9,16 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--cloud', default="/tmp/cloud.csv")
+    parser.add_argument('--hull', default="/tmp/hull.csv")
 
     args = parser.parse_args()
 
     cloud = np.genfromtxt(args.cloud, delimiter=' ')
+    hull= np.genfromtxt(args.hull, delimiter=' ')
 
     fig, ax = plt.subplots()
     ax.scatter(cloud[:,0], cloud[:,1])
+    ax.scatter(hull[:,0], hull[:,1])
 
     plt.show()
 

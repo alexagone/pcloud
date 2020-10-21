@@ -14,8 +14,9 @@ int main()
     auto fcloud = ofstream("/tmp/cloud.csv");
     pc->write(fcloud);
 
-    QuickHull qh;
-    qh(pc);
+    auto hull = ConvexHull::CreateConvexHull<QuickHull>(pc);
+    auto fhull = ofstream("/tmp/hull.csv");
+    hull->write(fhull);
 
     return 0;
 }

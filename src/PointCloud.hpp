@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cinttypes>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <random>
 #include <memory>
@@ -36,6 +37,16 @@ struct Point
         return *this;
     }
 
+    bool operator<(const Point& p) const
+    {
+        return x < p.x;
+    }
+
+    bool operator>(const Point& p) const
+    {
+        return x > p.x;
+    }
+
     double x;
     double y; 
 };
@@ -45,6 +56,11 @@ struct Point
  * A dynamically allocated contiguous array of Point
  */
 using PointArray = vector<Point>;
+
+/**
+ * An ordered set of Point
+ */
+using PointSet = set<Point>;
 
 /**
  * Compute the Euclidean distance between two points
@@ -240,11 +256,11 @@ class ConvexHullAlgo
 {
 public:
 
-    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+    PointSet operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
 private:
 
-    virtual PointArray _process(PointCloud::PointCloudPtr& points) { return PointArray(); }
+    virtual PointSet _process(PointCloud::PointCloudPtr& points) { return PointSet(); }
 };
 
 
@@ -257,14 +273,14 @@ public:
 
     QuickHull() : _hull() {}
 
-    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+    PointSet operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
     inline uint64_t getXminIndex(void) { return _xmin; }
     inline uint64_t getXmaxIndex(void) { return _xmax; }
 
 private:
 
-    virtual PointArray _process(PointCloud::PointCloudPtr& points)
+    virtual PointSet _process(PointCloud::PointCloudPtr& points)
     {
         _pa = points->getPointArray();
 
@@ -284,10 +300,10 @@ private:
         _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_RIGHT);
         _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_LEFT);
 
-        return _pa;
+        return _hull;
     }
 
-    void _processRecurse(Point& P1, Point& P2, SegmentSide side)
+    void _processRecurse(const Point& P1, const Point& P2, int side)
     {
         // index of most distant point from point array
         int i = 0;
@@ -316,17 +332,20 @@ private:
 
         // Stop condition for the recursion
         // Correspond to the condition where both Points are part of the convex hull
-        if(index < 0) {
+        if(index == -1) {
+            _hull.insert(P1);
+            _hull.insert(P2);
             return;
         }
 
-        // TODO:
         // 1. recursively process the right/left side of the segment for both segment
         //    (P1, P0)  and  (P0, P2)
+        _processRecurse(_pa[index], P1, determineSide2D(_pa[index], P2, P1));
+        _processRecurse(_pa[index], P2, determineSide2D(_pa[index], P1, P2));
     }
 
     PointArray _pa;
-    PointArray _hull;
+    PointSet _hull;
 
     uint64_t _xmin = 0;
     uint64_t _xmax = 0;
@@ -379,9 +398,19 @@ public:
         return 0.0;
     }
 
+    /**
+     * Dump internal points set into provided output stream
+     */
+    void write(ostream& stream)
+    {
+        auto print = [&stream](const Point& p) { stream << p.x << " " << p.y << endl; };
+
+        for_each(_hull.begin(), _hull.end(), print);
+    }
+
 private:
 
-    PointArray _hull;
+    PointSet _hull;
 };
 
 } // namespace Cloud
