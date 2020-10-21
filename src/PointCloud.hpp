@@ -163,7 +163,12 @@ public:
     }
 
     /**
-     * PointCloud  constructor
+     * PointCloud constructor using predefined point array
+     */
+    PointCloud(PointArray& pa) : _points(pa) {}
+
+    /**
+     * PointCloud constructor using initializer
      */
     PointCloud(PointCloudInitializer& init)
     {
@@ -222,30 +227,67 @@ class QuickHull : public ConvexHullAlgo
 {
 public:
 
+    typedef enum {
+        RIGHT_SIDE = 0,
+        LEFT_SIDE = 1
+    } SegmentSide;
+
     PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+
+    inline uint64_t getXminIndex(void) { return _xmin; }
+    inline uint64_t getXmaxIndex(void) { return _xmax; }
 
 private:
 
     virtual PointArray _process(PointCloud::PointCloudPtr& points)
     {
-        PointArray pa = points->getPointArray();
-        uint64_t n = pa.size();
+        _pa = points->getPointArray();
+        uint64_t n = _pa.size();
 
         // determine the min and max value over x axis
-        uint64_t xmin = 0;
-        uint64_t xmax = 0;
         for(uint64_t i = 1; i < n; ++i)
         {
-            if(pa[i].x < pa[xmin].x) {
-                xmin = i;
+            if(_pa[i].x < _pa[_xmin].x) {
+                _xmin = i;
             }
-            if(pa[i].x > pa[xmax].x) {
-                xmax = i;
+            if(_pa[i].x > _pa[_xmax].x) {
+                _xmax = i;
             }
         }
 
-        return pa;
+        _processRecurse(_pa[_xmin], _pa[_xmax], RIGHT_SIDE);
+        _processRecurse(_pa[_xmin], _pa[_xmax], LEFT_SIDE);
+
+        return _pa;
     }
+
+    void _processRecurse(Point& P1, Point& P2, SegmentSide s)
+    {
+        // index of most distant point from point array
+        int index = -1;
+
+        // TODO: 
+        // 1. Determine the left/right SegmentSide of each points contained in 
+        //    the point array as segmented by (P1, P2) axis. Only the SegmentSide s
+        //    Shall be considered
+        // 2. For all point on the SegmentSide s, determine the Point P0 that is the
+        //    furthest of the (P1, P2) axis.
+
+        // Stop condition for the recursion
+        // Correspond to the condition where both Points are part of the convex hull
+        if(index < 0) {
+            return;
+        }
+
+        // TODO:
+        // 1. recursively process the right/left side of the segment for both segment
+        //    (P1, P0)  and  (P0, P2)
+    }
+
+    PointArray _pa;
+
+    uint64_t _xmin = 0;
+    uint64_t _xmax = 0;
 };
 
 /**

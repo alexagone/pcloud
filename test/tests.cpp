@@ -48,3 +48,22 @@ TEST(TestComplexHull, TestInitialization)
 
     auto convexhull = ConvexHull::CreateConvexHull<QuickHull>(pc);
 }
+
+TEST(TestComplexHull, TestTrivialCase)
+{
+    PointArray pa{{5.0, 6.0},
+                  {7.0, 5.0},
+                  {3.0, 6.0},
+                  {6.0, 5.0},
+                  {3.0, 5.0},
+                  {2.0, 5.0}};
+
+    auto pc = make_shared<PointCloud>(pa);
+
+    QuickHull qh;
+    qh(pc);
+
+    EXPECT_EQ(qh.getXminIndex(), 5);
+    EXPECT_EQ(qh.getXmaxIndex(), 1);
+
+}
