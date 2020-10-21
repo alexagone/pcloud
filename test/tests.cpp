@@ -21,7 +21,14 @@ TEST(TestPoint, TestDistance2d)
     Point p1{0.0, 0.0};
     Point p2{2.0, 2.0};
 
-    EXPECT_EQ(distance2D(p1, p2), sqrt(8.0));
+    EXPECT_LT(abs(distance2D(p1, p2) - sqrt(8.0)), 1e-9);
 }
 
+TEST(TestPoint, TestDistanceToLine2d)
+{
+    Point p1{0.0, 4.0};
+    Point p2{4.0, 0.0};
+    Point c{4.0, 4.0};
 
+    EXPECT_LT(abs(distanceToLine2D(p1, p2, c) - sqrt(8.0)), 1e-9);
+}

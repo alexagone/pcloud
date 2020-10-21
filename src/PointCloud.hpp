@@ -58,6 +58,22 @@ double distance2D(Point& P1, Point& P2)
 }
 
 /**
+ * Compute the distance of a point C = (x0, y0) to a line define 
+ * by two points P1 and P2 where P1 = (x1, y1) and P2 = (x2, y2). 
+ *
+ * distanceToLine(P1, P2, C) = | (y2-y1)*x0 - (x2-x1)*y0 + x2*y1 - y2*x1 |
+ *                             -------------------------------------------
+ *                                   sqrt((y2 - y1)^2 + (x2 - x1)^2)
+ */
+double distanceToLine2D(Point& P1, Point& P2, Point& C)
+{
+    double num = abs((P2.y-P1.y)*C.x - (P2.x-P1.x)*C.y + P2.x*P1.y - P2.y*P1.x);
+    double det = distance2D(P1, P2);
+
+    return num / det;
+}
+
+/**
  * PointCloud initializer base class
  */
 class PointCloudInitializer
