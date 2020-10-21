@@ -173,6 +173,14 @@ public:
     }
 
     /**
+     * Return the number of elements contained by this point cloud
+     */
+    uint64_t getNbElements(void)
+    {
+        return _points.size();
+    }
+
+    /**
      * Dump internal points array into provided output stream
      */
     void write(ostream& stream)
@@ -185,6 +193,37 @@ public:
 private:
 
     PointArray _points;
+};
+
+/**
+ * Base class for convex hull determiantion algorithm
+ */
+class ConvexHullAlgo
+{
+public:
+
+    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+
+private:
+
+    virtual PointArray _process(PointCloud::PointCloudPtr& points) { return PointArray(); }
+};
+
+/**
+ * Quick hull implementation
+ */
+class QuickHull : public ConvexHullAlgo
+{
+public:
+
+    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+
+private:
+
+    virtual PointArray _process(PointCloud::PointCloudPtr& points)
+    {     
+        return PointArray();
+    }
 };
 
 /**
@@ -203,15 +242,20 @@ public:
     /**
      * Factory method to create a new convex hull out of a point cloud
      */
+    template<typename Algo>
     static ConvexHullPtr CreateConvexHull(PointCloud::PointCloudPtr points)
     {
-        return make_shared<ConvexHull>(points);
+        Algo algo;
+        return make_shared<ConvexHull>(algo, points);
     }
 
     /**
      * ConvexHull constructor
      */
-    ConvexHull(PointCloud::PointCloudPtr points) {}
+    ConvexHull(ConvexHullAlgo& algo, PointCloud::PointCloudPtr points)
+    {
+        _hull = algo(points);
+    }
 
     /**
      * Query the number of element that compose the hull

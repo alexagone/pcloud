@@ -32,3 +32,19 @@ TEST(TestPoint, TestDistanceToLine2d)
 
     EXPECT_LT(abs(distanceToLine2D(p1, p2, c) - sqrt(8.0)), 1e-9);
 }
+
+TEST(TestPointCloud, TestInitialization)
+{
+    auto init = PointCloudInitializerUniform();
+    auto pc = PointCloud::CreatePointCloud(init);
+
+    EXPECT_EQ(pc->getNbElements(), 100);
+}
+
+TEST(TestComplexHull, TestInitialization)
+{
+    auto init = PointCloudInitializerUniform();
+    auto pc = PointCloud::CreatePointCloud(init);
+
+    auto convexhull = ConvexHull::CreateConvexHull<QuickHull>(pc);
+}
