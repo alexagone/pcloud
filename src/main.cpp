@@ -8,6 +8,11 @@ using namespace std;
 
 int main()
 {
+    cout << "*********************************************" << endl;
+    cout << "*            nailedit demo app              *" << endl;
+    cout << "*********************************************" << endl;
+    cout << endl;
+
     const string CLOUD_CSV_PATH = "/tmp/nailedit_cloud.csv";
     const string HULL_CSV_PATH = "/tmp/nailedit_hull.csv";
 
@@ -24,6 +29,8 @@ int main()
     hull->write(fhull);
 
     cout << "Writing computed convex hull in " << HULL_CSV_PATH << endl;
+
+    cout << endl << "Run ./python/plot_cloud.py for visualization" << endl;
 
     return 0;
 }
