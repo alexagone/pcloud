@@ -221,6 +221,9 @@ public:
         _distx(_xmin, _xmax),
         _disty(_ymin, _ymax)
     {
+        if(_M == 0) {
+            throw runtime_error("error, specified number to generate point cloud cannot be 0");
+        }
     }
 
     virtual inline uint64_t len(void)
@@ -487,6 +490,10 @@ private:
 
     void _computePerimeter(void)
     {
+        if(_hull.size() <= 2) {
+            throw runtime_error("error, perimeter of 2 or less points is undefined");
+        }
+
         _hullPerimeter = distance2D(_hull.front(), _hull.back());
 
         uint64_t n = _hull.size();

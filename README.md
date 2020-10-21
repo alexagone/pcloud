@@ -59,3 +59,9 @@
     The following minimalistic python script is provided to visualize the generated point cloud and estimated convex hull.
 
         ./python/plot_cloud.py
+
+# Packaging
+
+    Simply:
+
+        git archive HEAD --format=tar.gz --prefix=alexandre_savard_ghgsat_technical_test/ > alexandre_savard_ghgsat_technical_test.tar.gz

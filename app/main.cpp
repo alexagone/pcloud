@@ -1,5 +1,6 @@
 #include "PointCloud.hpp"
 
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 
@@ -16,7 +17,14 @@ int main()
     const string CLOUD_CSV_PATH = "/tmp/nailedit_cloud.csv";
     const string HULL_CSV_PATH = "/tmp/nailedit_hull.csv";
 
-    auto init = PointCloudInitializerUniform();
+    uint64_t nbPoints = 0;
+    cout << "Enter number of nails to be inserted [3, ...)" << endl;
+   
+    cin >> noskipws; 
+    cin >> nbPoints;
+    cout << "Nb nails: " << nbPoints << endl << endl;
+
+    auto init = PointCloudInitializerUniform(nbPoints);
     auto pc = PointCloud::CreatePointCloud(init);
 
     auto fcloud = ofstream(CLOUD_CSV_PATH);
@@ -29,6 +37,8 @@ int main()
     hull->write(fhull);
 
     cout << "Writing computed convex hull in " << HULL_CSV_PATH << endl;
+
+    cout << endl << "Elastic lenght: " << hull->getPerimeter() << endl;
 
     cout << endl << "Run ./python/plot_cloud.py for visualization" << endl;
 

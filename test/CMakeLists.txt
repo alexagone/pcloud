@@ -7,6 +7,11 @@ include_directories(
 
 add_executable(nailedit_tests tests.cpp)
 
+target_include_directories(nailedit_tests
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+)
+
 target_link_directories(nailedit_tests
     PRIVATE
         ${CMAKE_BINARY_DIR}/install/lib
