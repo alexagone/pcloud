@@ -44,6 +44,18 @@
 
 # Runing the application
 
-   Demo application can be run after a successful build using:
+    Demo application can be run after a successful build using:
 
         ./build/src/nailedit
+
+    This will generate two files that contain respectively the point cloud coordinates and convex hull estimated by the algorithm.
+
+        /tmp/nailedit_cloud.csv
+        /tmp/nailedit_hull.csv
+
+
+# Point cloud visualization
+
+    The following minimalistic python script is provided to visualize the generated point cloud and estimated convex hull.
+
+        ./python/plot_cloud.py
