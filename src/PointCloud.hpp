@@ -454,6 +454,7 @@ public:
     ConvexHull(ConvexHullAlgo& algo, PointCloud::PointCloudPtr points)
     {
         _hull = algo(points);
+        _computePerimeter();
     }
 
     /**
@@ -469,7 +470,7 @@ public:
      */
     double getPerimeter(void)
     {
-        return 0.0;
+        return _hullPerimeter;
     }
 
     /**
@@ -484,7 +485,18 @@ public:
 
 private:
 
+    void _computePerimeter(void)
+    {
+        _hullPerimeter = distance2D(_hull.front(), _hull.back());
+
+        uint64_t n = _hull.size();
+        for(uint64_t i = 1; i < n; ++i) {
+            _hullPerimeter += distance2D(_hull[i], _hull[i-1]);
+        }
+    }
+
     PointArray _hull;
+    double _hullPerimeter = 0.0;
 };
 
 } // namespace Cloud

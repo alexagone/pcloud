@@ -53,7 +53,7 @@ TEST(TestPointCloud, TestInitialization)
     EXPECT_EQ(pc->getNbElements(), 100);
 }
 
-TEST(TestComplexHull, TestInitialization)
+TEST(TestConvexHull, TestInitialization)
 {
     auto init = PointCloudInitializerUniform();
     auto pc = PointCloud::CreatePointCloud(init);
@@ -61,7 +61,7 @@ TEST(TestComplexHull, TestInitialization)
     auto convexhull = ConvexHull::CreateConvexHull<QuickHull>(pc);
 }
 
-TEST(TestComplexHull, TestTrivialCase)
+TEST(TestConvexHull, TestTrivialCase)
 {
     PointArray pa{{0.59, 0.61},
                   {0.78, 0.54},
@@ -91,4 +91,22 @@ TEST(TestComplexHull, TestTrivialCase)
     EXPECT_EQ(hull[2].y, p2.y);
     EXPECT_EQ(hull[3].x, p3.x);
     EXPECT_EQ(hull[3].y, p3.y);
+}
+
+
+TEST(TestConvexHull, TestPerimeter)
+{
+    PointArray pa{{0.59, 0.61},
+                  {0.78, 0.54},
+                  {0.33, 0.63},
+                  {0.63, 0.59},
+                  {0.34, 0.58},
+                  {0.28, 0.52}};
+
+    auto pc = make_shared<PointCloud>(pa);
+
+    auto convexhull = ConvexHull::CreateConvexHull<QuickHull>(pc);
+
+    EXPECT_EQ(convexhull->getNbElements(), 4);
+    EXPECT_LT(fabs(convexhull->getPerimeter() - 1.08448), 1e-4);
 }
