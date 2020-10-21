@@ -73,6 +73,34 @@ double distanceToLine2D(Point& P1, Point& P2, Point& C)
     return num / det;
 }
 
+typedef enum {
+    SIDE_RIGHT = 0,
+    SIDE_LEFT = 1,
+    SIDE_UNKNOWN = 2
+} SegmentSide;
+
+/**
+ * Compute the side of the points P0 given the segment (P1, P2)
+ * where P0=(x0, y0), P1=(x1, y1), P2=(x2, y2)
+ *
+ * d = (x0-x1)(y2-y1) * (y0-y1)(x2-x1)
+ * 
+ * if d < 0 then P0 is on the right side
+ * if d > 0 then P0 is on the left side
+ */
+SegmentSide determineSide(Point& P1, Point& P2, Point& P0)
+{
+    double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
+
+    if (val > 0)
+        return SIDE_RIGHT;
+
+    if (val < 0)
+        return SIDE_LEFT;
+
+    return SIDE_UNKNOWN;
+}
+
 /**
  * PointCloud initializer base class
  */
@@ -227,11 +255,6 @@ class QuickHull : public ConvexHullAlgo
 {
 public:
 
-    typedef enum {
-        RIGHT_SIDE = 0,
-        LEFT_SIDE = 1
-    } SegmentSide;
-
     PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
     inline uint64_t getXminIndex(void) { return _xmin; }
@@ -255,8 +278,9 @@ private:
             }
         }
 
-        _processRecurse(_pa[_xmin], _pa[_xmax], RIGHT_SIDE);
-        _processRecurse(_pa[_xmin], _pa[_xmax], LEFT_SIDE);
+        // process recursively each side of the segment created by xmin, xmax
+        _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_RIGHT);
+        _processRecurse(_pa[_xmin], _pa[_xmax], SIDE_LEFT);
 
         return _pa;
     }

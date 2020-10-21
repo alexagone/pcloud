@@ -33,6 +33,18 @@ TEST(TestPoint, TestDistanceToLine2d)
     EXPECT_LT(abs(distanceToLine2D(p1, p2, c) - sqrt(8.0)), 1e-9);
 }
 
+TEST(TestPoint, TestSegmentSide)
+{
+    Point p1{0.0, 4.0};
+    Point p2{4.0, 0.0};
+
+    Point pright{1.0, 1.0};
+    Point pleft{3.0, 3.0};
+
+    EXPECT_EQ(determineSide(p1, p2, pright), SIDE_RIGHT);
+    EXPECT_EQ(determineSide(p1, p2, pleft), SIDE_LEFT);
+}
+
 TEST(TestPointCloud, TestInitialization)
 {
     auto init = PointCloudInitializerUniform();
