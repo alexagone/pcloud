@@ -41,8 +41,8 @@ TEST(TestPoint, TestSegmentSide)
     Point pright{1.0, 1.0};
     Point pleft{3.0, 3.0};
 
-    EXPECT_EQ(determineSide(p1, p2, pright), SIDE_RIGHT);
-    EXPECT_EQ(determineSide(p1, p2, pleft), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(p1, p2, pright), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(p1, p2, pleft), SIDE_LEFT);
 }
 
 TEST(TestPointCloud, TestInitialization)
@@ -63,12 +63,12 @@ TEST(TestComplexHull, TestInitialization)
 
 TEST(TestComplexHull, TestTrivialCase)
 {
-    PointArray pa{{5.0, 6.0},
-                  {7.0, 5.0},
-                  {3.0, 6.0},
-                  {6.0, 5.0},
-                  {3.0, 5.0},
-                  {2.0, 5.0}};
+    PointArray pa{{0.59, 0.61},
+                  {0.78, 0.54},
+                  {0.33, 0.63},
+                  {0.63, 0.59},
+                  {0.34, 0.58},
+                  {0.28, 0.52}};
 
     auto pc = make_shared<PointCloud>(pa);
 
@@ -77,5 +77,4 @@ TEST(TestComplexHull, TestTrivialCase)
 
     EXPECT_EQ(qh.getXminIndex(), 5);
     EXPECT_EQ(qh.getXmaxIndex(), 1);
-
 }

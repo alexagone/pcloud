@@ -14,5 +14,8 @@ int main()
     auto fcloud = ofstream("/tmp/cloud.csv");
     pc->write(fcloud);
 
+    QuickHull qh;
+    qh(pc);
+
     return 0;
 }

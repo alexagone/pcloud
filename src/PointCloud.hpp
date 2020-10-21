@@ -52,7 +52,7 @@ using PointArray = vector<Point>;
  *
  * distance(P1, P2) = sqrt((y2 - y1)^2 + (x2 - x1)^2)
  */
-double distance2D(Point& P1, Point& P2)
+double distance2D(const Point& P1, const Point& P2)
 {
     return sqrt((P2.y-P1.y)*(P2.y-P1.y) + (P2.x-P1.x)*(P2.x-P1.x));
 }
@@ -65,7 +65,7 @@ double distance2D(Point& P1, Point& P2)
  *                             -------------------------------------------
  *                                   sqrt((y2 - y1)^2 + (x2 - x1)^2)
  */
-double distanceToLine2D(Point& P1, Point& P2, Point& C)
+double distanceToLine2D(const Point& P1, const Point& P2, const Point& C)
 {
     double num = abs((P2.y-P1.y)*C.x - (P2.x-P1.x)*C.y + P2.x*P1.y - P2.y*P1.x);
     double det = distance2D(P1, P2);
@@ -88,7 +88,7 @@ typedef enum {
  * if d < 0 then P0 is on the right side
  * if d > 0 then P0 is on the left side
  */
-SegmentSide determineSide(Point& P1, Point& P2, Point& P0)
+SegmentSide determineSide2D(const Point& P1, const Point& P2, const Point& P0)
 {
     double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
 
@@ -255,6 +255,8 @@ class QuickHull : public ConvexHullAlgo
 {
 public:
 
+    QuickHull() : _hull() {}
+
     PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
 
     inline uint64_t getXminIndex(void) { return _xmin; }
@@ -265,9 +267,9 @@ private:
     virtual PointArray _process(PointCloud::PointCloudPtr& points)
     {
         _pa = points->getPointArray();
-        uint64_t n = _pa.size();
 
         // determine the min and max value over x axis
+        uint64_t n = _pa.size();
         for(uint64_t i = 1; i < n; ++i)
         {
             if(_pa[i].x < _pa[_xmin].x) {
@@ -285,17 +287,32 @@ private:
         return _pa;
     }
 
-    void _processRecurse(Point& P1, Point& P2, SegmentSide s)
+    void _processRecurse(Point& P1, Point& P2, SegmentSide side)
     {
         // index of most distant point from point array
+        int i = 0;
         int index = -1;
+        double max_distance = 0;
 
-        // TODO: 
         // 1. Determine the left/right SegmentSide of each points contained in 
         //    the point array as segmented by (P1, P2) axis. Only the SegmentSide s
         //    Shall be considered
         // 2. For all point on the SegmentSide s, determine the Point P0 that is the
         //    furthest of the (P1, P2) axis.
+        auto findFurthest = [&i, &index, &max_distance, P1, P2, side](Point& P0)
+        { 
+            auto s = determineSide2D(P1, P2, P0);
+            if(s == side) {
+                auto distance = distanceToLine2D(P1, P2, P0);
+                if(distance > max_distance) {
+                    index = i;
+                    max_distance = distance;
+                }
+            } 
+
+            ++i;
+        };
+        for_each(_pa.begin(), _pa.end(), findFurthest);
 
         // Stop condition for the recursion
         // Correspond to the condition where both Points are part of the convex hull
@@ -309,6 +326,7 @@ private:
     }
 
     PointArray _pa;
+    PointArray _hull;
 
     uint64_t _xmin = 0;
     uint64_t _xmax = 0;
