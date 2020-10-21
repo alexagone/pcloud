@@ -47,6 +47,17 @@ struct Point
 using PointArray = vector<Point>;
 
 /**
+ * Compute the Euclidean distance between two points
+ * P1 and P2 where P1 = (x1, y1) and P2 = (x2, y2).
+ *
+ * distance(P1, P2) = sqrt((y2 - y1)^2 + (x2 - x1)^2)
+ */
+double distance2D(Point& P1, Point& P2)
+{
+    return sqrt((P2.y-P1.y)*(P2.y-P1.y) + (P2.x-P1.x)*(P2.x-P1.x));
+}
+
+/**
  * PointCloud initializer base class
  */
 class PointCloudInitializer

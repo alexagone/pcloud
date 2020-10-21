@@ -15,3 +15,13 @@ TEST(TestPoint, TestCopyAndAssignment)
     EXPECT_EQ(p1.y, p2.y);
     EXPECT_EQ(p1.y, p3.y);
 }
+
+TEST(TestPoint, TestDistance2d)
+{
+    Point p1{0.0, 0.0};
+    Point p2{2.0, 2.0};
+
+    EXPECT_EQ(distance2D(p1, p2), sqrt(8.0));
+}
+
+
