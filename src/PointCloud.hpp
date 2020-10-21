@@ -181,6 +181,11 @@ public:
     }
 
     /**
+     * Return the point array for this cloud
+     */
+    PointArray getPointArray(void) { return _points; }
+
+    /**
      * Dump internal points array into provided output stream
      */
     void write(ostream& stream)
@@ -209,6 +214,7 @@ private:
     virtual PointArray _process(PointCloud::PointCloudPtr& points) { return PointArray(); }
 };
 
+
 /**
  * Quick hull implementation
  */
@@ -221,8 +227,24 @@ public:
 private:
 
     virtual PointArray _process(PointCloud::PointCloudPtr& points)
-    {     
-        return PointArray();
+    {
+        PointArray pa = points->getPointArray();
+        uint64_t n = pa.size();
+
+        // determine the min and max value over x axis
+        uint64_t xmin = 0;
+        uint64_t xmax = 0;
+        for(uint64_t i = 1; i < n; ++i)
+        {
+            if(pa[i].x < pa[xmin].x) {
+                xmin = i;
+            }
+            if(pa[i].x > pa[xmax].x) {
+                xmax = i;
+            }
+        }
+
+        return pa;
     }
 };
 
