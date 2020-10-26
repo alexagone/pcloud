@@ -51,9 +51,17 @@ struct Point
         return x > p.x;
     }
 
+
     double x;
     double y; 
 };
+
+ostream& operator<<(ostream& os, const Point& p)
+{
+    os << "(" << p.x << ',' << p.y << ")";
+    
+    return os;
+}
 
 /**
  * Define a binary minus operation for Point class
@@ -61,6 +69,14 @@ struct Point
 Point operator-(const Point& lh, const Point& rh)
 {
     return Point{lh.x-rh.x, lh.y-rh.y};
+}
+
+/**
+ * Define a binary add operation for Point class
+ */
+Point operator+(const Point& lh, const Point& rh)
+{
+    return Point{lh.x+rh.x, lh.y+rh.y};
 }
 
 /**
@@ -406,8 +422,8 @@ private:
 
         // 1. recursively process the right/left side of the segment for both segment
         //    (P1, P0)  and  (P0, P2)
-        _processRecurse(pa, pa[index], P1, determineSide2D(pa[index], P2, P1));
-        _processRecurse(pa, pa[index], P2, determineSide2D(pa[index], P1, P2));
+        _processRecurse(pa, pa[index], P1, 1-determineSide2D(pa[index], P1, P2));
+        _processRecurse(pa, pa[index], P2, 1-determineSide2D(pa[index], P2, P1));
     }
 
     /**

@@ -41,9 +41,13 @@ TEST(TestPoint, TestSegmentSide)
     Point pleft{1.0, 1.0};
     Point pright{3.0, 3.0};
 
+    EXPECT_EQ(determineSide2D(p2, p1, pleft), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(p2, p1, pright), SIDE_RIGHT);
+
     EXPECT_EQ(determineSide2D(p1, p2, pright), SIDE_LEFT);
     EXPECT_EQ(determineSide2D(p1, p2, pleft), SIDE_RIGHT);
 }
+
 
 TEST(TestPointCloud, TestInitialization)
 {
@@ -72,16 +76,68 @@ TEST(TestConvexHull, TestTrivialCase)
 
     auto pc = make_shared<PointCloud>(pa);
 
+    // xmin index is 5
+    // xmax index is 1
+
+    Point P1 = pa[5];
+    Point P2 = pa[1];
+
+    // determine side, all should be on side 1
+    EXPECT_EQ(determineSide2D(P1, P2, pa[0]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(P1, P2, pa[2]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(P1, P2, pa[3]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(P1, P2, pa[4]), SIDE_LEFT);
+
+    // furthest is index 2 with 0.107914 
+    EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[0]) - 0.077538), 1e-6);
+    EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[2]) - 0.107914), 1e-6);
+    EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[3]) - 0.0559553), 1e-6);
+    EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[4]) - 0.057554), 1e-6);
+
+    // determineSide2d
+    EXPECT_EQ(determineSide2D(pa[2], P2, P1), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(pa[2], P1, P2), SIDE_LEFT);
+
+    // verify the side for every point of segment pa[2], P1
+    EXPECT_EQ(determineSide2D(pa[2], P1, pa[0]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[2], P1, pa[1]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[2], P1, pa[3]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[2], P1, pa[4]), SIDE_LEFT);
+    // the algorithm should stop there as this segment contains only inner points
+
+    // verify the side for every point of segment pa[2], P2
+    EXPECT_EQ(determineSide2D(pa[2], P2, pa[0]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[2], P2, pa[1]), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(pa[2], P2, pa[3]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[2], P2, pa[4]), SIDE_RIGHT);
+
+    // determine the furthest point pa[2], P2, which is pa[0]
+    EXPECT_LT(abs(distanceToLine2D(pa[2], P2, pa[0]) - 0.0313786), 1e-6);
+    EXPECT_LT(abs(distanceToLine2D(pa[2], P2, pa[3]) - 0.0196116), 1e-6);
+
+    EXPECT_EQ(determineSide2D(pa[0], pa[2], P2), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[0], P2, pa[2]), SIDE_RIGHT);
+
+    EXPECT_EQ(determineSide2D(pa[0], P2, pa[2]), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(pa[0], P2, pa[3]), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(pa[0], P2, pa[4]), SIDE_RIGHT);
+    EXPECT_EQ(determineSide2D(pa[0], P2, pa[5]), SIDE_RIGHT);
+
+    EXPECT_EQ(determineSide2D(pa[0], pa[2], pa[1]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[0], pa[2], pa[3]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[0], pa[2], pa[4]), SIDE_LEFT);
+    EXPECT_EQ(determineSide2D(pa[0], pa[2], pa[5]), SIDE_LEFT);
+
     QuickHull qh;
     auto hull = qh(pc);
 
     EXPECT_EQ(qh.getXminIndex(), 5);
     EXPECT_EQ(qh.getXmaxIndex(), 1);
 
-    Point p0{0.78, 0.54};
-    Point p1{0.28, 0.52};
-    Point p2{0.33, 0.63};
-    Point p3{0.59, 0.61};
+    Point p0(P2);
+    Point p1(P1);
+    Point p2(pa[2]);
+    Point p3(pa[0]);
 
     EXPECT_EQ(hull[0].x, p0.x);
     EXPECT_EQ(hull[0].y, p0.y);
@@ -91,6 +147,21 @@ TEST(TestConvexHull, TestTrivialCase)
     EXPECT_EQ(hull[2].y, p2.y);
     EXPECT_EQ(hull[3].x, p3.x);
     EXPECT_EQ(hull[3].y, p3.y);
+}
+
+TEST(TestConvexHull, TestTrivialCase2)
+{
+    PointArray pa{{0.591107, 0.852247},
+                  {0.771903, 0.0974454},
+                  {0.104228, 0.75303},
+                  {0.27302,  0.425654},
+                  {0.273791, 0.173948},
+                  {0.331152, 0.496003}};
+
+    auto pc = make_shared<PointCloud>(pa);
+
+    QuickHull qh;
+    auto hull = qh(pc);
 }
 
 

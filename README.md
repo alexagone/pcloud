@@ -20,6 +20,14 @@
 
         build/src/nailedit
 
+    To compile in Release mode
+
+        cmake -DCMAKE_BUILD_TYPE=Release ..
+
+    To compile in Debug mode
+
+        cmake -DCMKAE_BUILD_TYPE=Debug ..
+
 
 # Tests (optional)
 
@@ -64,4 +72,4 @@
 
     Simply:
 
-        git archive HEAD --format=tar.gz --prefix=alexandre_savard_ghgsat_technical_test/ > alexandre_savard_ghgsat_technical_test.tar.gz
+        git archive HEAD --format=tar.gz --prefix=pcloud/ > pcloud.tar.gz
