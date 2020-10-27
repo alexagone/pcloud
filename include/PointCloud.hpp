@@ -280,8 +280,15 @@ public:
     /**
      * Factory method to create a new point cloud using specified initializer
      */
-    static PointCloudPtr CreatePointCloud(PointCloudInitializer& init)
+    template <typename Init>
+    static PointCloudPtr CreatePointCloud(
+        const uint64_t M=100,
+        const double xmin=0.0,
+        const double xmax=1.0,
+        const double ymin=0.0,
+        const double ymax=1.0)
     {
+        Init init(M); 
         return make_shared<PointCloud>(init);
     }
 
@@ -363,17 +370,19 @@ private:
     {
         PointArray pa = points->getPointArray();
 
-        // determine the min and max value over x axis
-        uint64_t n = pa.size();
-        for(uint64_t i = 1; i < n; ++i)
+        uint64_t i = 0;
+        auto minmax = [this, &i, pa](Point& p)
         {
-            if(pa[i].x < pa[_xmin].x) {
+            if(p.x < pa[_xmin].x) {
                 _xmin = i;
             }
-            if(pa[i].x > pa[_xmax].x) {
+            if(p.x > pa[_xmax].x) {
                 _xmax = i;
             }
-        }
+            ++i;
+        };
+
+        for_each(pa.begin(), pa.end(), minmax);
 
         // process recursively each side of the segment created by xmin, xmax
         _processRecurse(pa, pa[_xmin], pa[_xmax], SIDE_RIGHT);

@@ -51,16 +51,14 @@ TEST(TestPoint, TestSegmentSide)
 
 TEST(TestPointCloud, TestInitialization)
 {
-    auto init = PointCloudInitializerUniform();
-    auto pc = PointCloud::CreatePointCloud(init);
+    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>();
 
     EXPECT_EQ(pc->getNbElements(), 100);
 }
 
 TEST(TestConvexHull, TestInitialization)
 {
-    auto init = PointCloudInitializerUniform();
-    auto pc = PointCloud::CreatePointCloud(init);
+    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>();
 
     auto convexhull = ConvexHull::CreateConvexHull<QuickHull>(pc);
 }
