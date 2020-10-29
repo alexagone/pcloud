@@ -41,11 +41,11 @@ TEST(TestPoint, TestSegmentOrientation)
     Point pleft{1.0, 1.0};
     Point pright{3.0, 3.0};
 
-    EXPECT_EQ(determineOrientation2D(p2, p1, pleft), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(p2, p1, pright), ORIENTATION_RIGHT);
+    EXPECT_EQ(determineOrientation2D(p2, p1, pleft), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p2, p1, pright), ORIENTATION_CLOCKWISE);
 
-    EXPECT_EQ(determineOrientation2D(p1, p2, pright), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(p1, p2, pleft), ORIENTATION_RIGHT);
+    EXPECT_EQ(determineOrientation2D(p1, p2, pright), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p1, p2, pleft), ORIENTATION_CLOCKWISE);
 }
 
 TEST(TestPointCloud, TestInitialization)
@@ -80,10 +80,10 @@ TEST(TestConvexHull, TestQuickHullManual)
     Point P2 = pa[1];
 
     // determine side, all should be on side 1
-    EXPECT_EQ(determineOrientation2D(P1, P2, pa[0]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(P1, P2, pa[2]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(P1, P2, pa[3]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(P1, P2, pa[4]), ORIENTATION_LEFT);
+    EXPECT_EQ(determineOrientation2D(P1, P2, pa[0]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(P1, P2, pa[2]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(P1, P2, pa[3]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(P1, P2, pa[4]), ORIENTATION_COUNTERCLOCKWISE);
 
     // furthest is index 2 with 0.107914 
     EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[0]) - 0.077538), 1e-6);
@@ -92,38 +92,38 @@ TEST(TestConvexHull, TestQuickHullManual)
     EXPECT_LT(abs(distanceToLine2D(P1, P2, pa[4]) - 0.057554), 1e-6);
 
     // determineOrientation2d
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, P1), ORIENTATION_RIGHT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P1, P2), ORIENTATION_LEFT);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, P1), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P1, P2), ORIENTATION_COUNTERCLOCKWISE);
 
     // verify the side for every point of segment pa[2], P1
-    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[0]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[1]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[3]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[4]), ORIENTATION_LEFT);
+    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[0]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[1]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[3]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P1, pa[4]), ORIENTATION_COUNTERCLOCKWISE);
     // the algorithm should stop there as this segment contains only inner points
 
     // verify the side for every point of segment pa[2], P2
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[0]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[1]), ORIENTATION_RIGHT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[3]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[4]), ORIENTATION_RIGHT);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[0]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[1]), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[3]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[4]), ORIENTATION_CLOCKWISE);
 
     // determine the furthest point pa[2], P2, which is pa[0]
     EXPECT_LT(abs(distanceToLine2D(pa[2], P2, pa[0]) - 0.0313786), 1e-6);
     EXPECT_LT(abs(distanceToLine2D(pa[2], P2, pa[3]) - 0.0196116), 1e-6);
 
-    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], P2), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[2]), ORIENTATION_RIGHT);
+    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], P2), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[2]), ORIENTATION_CLOCKWISE);
 
-    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[2]), ORIENTATION_RIGHT);
-    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[3]), ORIENTATION_RIGHT);
-    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[4]), ORIENTATION_RIGHT);
-    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[5]), ORIENTATION_RIGHT);
+    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[2]), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[3]), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[4]), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], P2, pa[5]), ORIENTATION_CLOCKWISE);
 
-    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[1]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[3]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[4]), ORIENTATION_LEFT);
-    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[5]), ORIENTATION_LEFT);
+    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[1]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[3]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[4]), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[0], pa[2], pa[5]), ORIENTATION_COUNTERCLOCKWISE);
 
     QuickHull qh;
     auto hull = qh(pc);

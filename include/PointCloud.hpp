@@ -177,8 +177,8 @@ private:
  * Side definition, used to determine if points are right or left from a reference position
  */ 
 typedef enum {
-    ORIENTATION_RIGHT = 0,
-    ORIENTATION_LEFT = 1,
+    ORIENTATION_CLOCKWISE = 0,
+    ORIENTATION_COUNTERCLOCKWISE = 1,
     ORIENTATION_UNKNOWN = 2
 } SegmentOrientation;
 
@@ -196,10 +196,10 @@ SegmentOrientation determineOrientation2D(const Point& P1, const Point& P2, cons
     double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
 
     if (val > 0)
-        return ORIENTATION_RIGHT;
+        return ORIENTATION_CLOCKWISE;
 
     if (val < 0)
-        return ORIENTATION_LEFT;
+        return ORIENTATION_COUNTERCLOCKWISE;
 
     return ORIENTATION_UNKNOWN;
 }
@@ -396,8 +396,8 @@ private:
         for_each(pa.begin(), pa.end(), minmax);
 
         // process recursively each side of the segment created by xmin, xmax
-        _processRecurse(pa, pa[_xmin], pa[_xmax], ORIENTATION_RIGHT);
-        _processRecurse(pa, pa[_xmin], pa[_xmax], ORIENTATION_LEFT);
+        _processRecurse(pa, pa[_xmin], pa[_xmax], ORIENTATION_CLOCKWISE);
+        _processRecurse(pa, pa[_xmin], pa[_xmax], ORIENTATION_COUNTERCLOCKWISE);
 
         // sort the final result
         _sortClockWise();
@@ -505,7 +505,7 @@ private:
             q = (p+1)%n;  
             for(uint64_t i = 0; i < n; ++i)
             {
-                if(determineOrientation2D(pa[p], pa[i], pa[q]) == ORIENTATION_LEFT)
+                if(determineOrientation2D(pa[p], pa[i], pa[q]) == ORIENTATION_COUNTERCLOCKWISE)
                     q = i;
             }
             p = q;
