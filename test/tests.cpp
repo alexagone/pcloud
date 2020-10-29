@@ -16,6 +16,20 @@ TEST(TestPoint, TestCopyAndAssignment)
     EXPECT_EQ(p1.y, p3.y);
 }
 
+TEST(TestPoint, TestMultiplicationByScalar)
+{
+    Point p1{4.0, 4.0};
+    Point p2 = p1 * 0.5;
+
+    EXPECT_EQ(p2.x, 2.0);
+    EXPECT_EQ(p2.y, 2.0);
+
+    Point p3 = 0.5 * p1;
+
+    EXPECT_EQ(p3.x, 2.0);
+    EXPECT_EQ(p3.y, 2.0);
+}
+
 TEST(TestPoint, TestDistance2d)
 {
     Point p1{0.0, 0.0};

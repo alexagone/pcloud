@@ -79,11 +79,37 @@ Point operator+(const Point& lh, const Point& rh)
 }
 
 /**
+ * Define a binary multiplication of a point by a scalar
+ */
+Point operator*(const Point& lh, const float alpha)
+{
+    return Point{lh.x*alpha, lh.y*alpha};
+}
+
+/**
+ * Define a binary multiplication of a point by a scalar (reverse order)
+ */
+Point operator*(const float alpha, const Point& lh)
+{
+    return Point{lh.x*alpha, lh.y*alpha};
+}
+
+/**
  * Define comparison operator
  */
 bool operator==(const Point& lh, const Point& rh)
 {
     return (lh.x == lh.y) && (rh.x == rh.y);
+}
+
+/**
+ * Compute the convex combination of two points P3, given P1 and P2
+ *
+ *  P3 = alpha * P1 + (1 - alpha) * P2
+ */
+Point convexCombination(const Point& P1, const Point& P2, const float alpha)
+{
+    return (P1 * alpha) + (P2 * (1.0 - alpha));
 }
 
 /**
