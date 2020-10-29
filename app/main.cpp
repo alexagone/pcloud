@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <functional>
+#include <array>
 
 using namespace Cloud;
 using namespace std;
@@ -17,10 +19,10 @@ int main()
     const string CLOUD_CSV_PATH = "/tmp/nailedit_cloud.csv";
     const string HULL_CSV_PATH = "/tmp/nailedit_hull.csv";
 
-    uint64_t nbPoints = 0;
-    cout << "Enter number of nails to be inserted [3, ...)" << endl;
-   
     cin >> noskipws; 
+
+    cout << "Enter number of nails to be inserted [3, ...)" << endl;
+    uint64_t nbPoints = 0;
     cin >> nbPoints;
     cout << "Nb nails: " << nbPoints << endl << endl;
 
@@ -31,7 +33,26 @@ int main()
 
     cout << "Writing generated point cloud in " << CLOUD_CSV_PATH << endl;
 
-    auto hull = ConvexHull::CreateConvexHull<QuickHull>(pc);
+    array<function<ConvexHull::ConvexHullPtr(PointCloud::PointCloudPtr)>, 2> arr = 
+    {
+        ConvexHull::CreateConvexHull<QuickHull>,
+        ConvexHull::CreateConvexHull<GiftWrapping>
+    };
+
+    cout << "Enter algorithm selection:" << endl;
+    cout << "0: QuickHull" << endl;
+    cout << "1: GiftWrapping" << endl;
+    uint64_t algo = 0;
+    cin.clear();
+    cin.ignore();
+    cin >> algo;
+   
+    if(algo > 1)
+        throw runtime_error("Algo cannot be larger than 1");
+    
+    // auto hull = ConvexHull::CreateConvexHull<QuickHull>(pc);
+    // auto hull = ConvexHull::CreateConvexHull<GiftWrapping>(pc);
+    auto hull = arr[algo](pc);
     auto fhull = ofstream(HULL_CSV_PATH);
     hull->write(fhull);
 

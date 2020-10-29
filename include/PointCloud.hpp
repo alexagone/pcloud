@@ -51,7 +51,6 @@ struct Point
         return x > p.x;
     }
 
-
     double x;
     double y; 
 };
@@ -124,6 +123,18 @@ double distanceToLine2D(const Point& P1, const Point& P2, const Point& C)
     return num / det;
 }
 
+double getSegmentAngle(const Point& p0, const Point& p1)
+{
+
+    auto p = p1 - p0;
+
+    if(p.y >= 0.0)
+        return atan2(p.y, p.x);
+    else
+        return 2*pi() + atan2(p.y, p.x);
+    
+}
+
 class SortClockwise
 {
 public:
@@ -180,7 +191,7 @@ typedef enum {
  * if d < 0 then P0 is on the right side
  * if d > 0 then P0 is on the left side
  */
-SegmentSide determineSide2D(const Point& P1, const Point& P2, const Point& P0)
+SegmentSide determineOrientation2D(const Point& P1, const Point& P2, const Point& P0)
 {
     double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
 
@@ -408,7 +419,7 @@ private:
         //    furthest of the (P1, P2) axis.
         auto findFurthest = [&i, &index, &max_distance, P1, P2, side](Point& P0)
         { 
-            auto s = determineSide2D(P1, P2, P0);
+            auto s = determineOrientation2D(P1, P2, P0);
             if(s == side) {
                 auto distance = distanceToLine2D(P1, P2, P0);
                 if(distance > max_distance) {
@@ -431,8 +442,8 @@ private:
 
         // 1. recursively process the right/left side of the segment for both segment
         //    (P1, P0)  and  (P0, P2)
-        _processRecurse(pa, pa[index], P1, 1-determineSide2D(pa[index], P1, P2));
-        _processRecurse(pa, pa[index], P2, 1-determineSide2D(pa[index], P2, P1));
+        _processRecurse(pa, pa[index], P1, 1-determineOrientation2D(pa[index], P1, P2));
+        _processRecurse(pa, pa[index], P2, 1-determineOrientation2D(pa[index], P2, P1));
     }
 
     /**
@@ -451,6 +462,80 @@ private:
 
     uint64_t _xmin = 0;
     uint64_t _xmax = 0;
+};
+
+/**
+ * Gift wrapping implementation
+ */
+class GiftWrapping : public ConvexHullAlgo
+{
+public:
+
+    GiftWrapping() : _hull() {}
+
+    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
+
+    inline uint64_t getXminIndex(void) { return _xmin; }
+
+private:
+
+    virtual PointArray _process(PointCloud::PointCloudPtr& points)
+    {
+        _hull.clear();
+
+        PointArray pa = points->getPointArray();
+
+        uint64_t i = 0;
+        auto minmax = [this, &i, pa](Point& p)
+        {
+            if(p.x < pa[_xmin].x) {
+                _xmin = i;
+            }
+            ++i;
+        };
+
+        for_each(pa.begin(), pa.end(), minmax);
+
+        uint64_t n = pa.size();
+        uint64_t p = _xmin, q;
+        do
+        {
+            _hull.push_back(pa[p]);
+
+            q = (p+1)%n;  
+            for(uint64_t i = 0; i < n; ++i)
+            {
+                if(determineOrientation2D(pa[p], pa[i], pa[q]) == SIDE_LEFT)
+                    q = i;
+            }
+            p = q;
+        }
+        while(p != _xmin);
+
+        _sortClockWise();
+
+        return _hull;
+    }
+
+    int _orientation(const Point& p, const Point& q, const Point& r)
+    {
+        int val = (q.y-p.y)*(r.x-q.x) - (q.x-p.x)*(r.y-q.y);
+
+        if(val == 0)
+            return 0;
+
+        return (val > 0) ? 1 : 2;
+    }
+
+    void _sortClockWise(void)
+    {
+        SortClockwise sortClockwise(_hull);
+        sort(_hull.begin(), _hull.end(), sortClockwise);
+    }
+
+    PointArray _hull;
+
+    uint64_t _xmin = 0;
 };
 
 /**
