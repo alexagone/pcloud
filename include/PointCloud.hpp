@@ -113,6 +113,21 @@ Point convexCombination(const Point& P1, const Point& P2, const float alpha)
 }
 
 /**
+ * Compute the cross product of two vector at origin
+ *
+ *   det ((x1, y1), (x2, y2))
+ *
+ * If p1 x p2 is positive, then p1 is clockwise from p2 with respect to the origin,
+ * if cross product is negative, then p1 is counterclockwise from p2.
+ *
+ * We can also interpret the cross product p1 p2 as the signed area of the parallelogram 
+ * formed by the points (0, 0), p1, p2, and p1 + p2 = (p1.x + p2.x, p1.y + p2.y).
+ */
+double crossProduct(const Point& P1, const Point& P2)
+{
+    return (P1.x*P2.y) - (P2.x*P1.y);
+}
+/**
  * A dynamically allocated contiguous array of Point
  */
 using PointArray = vector<Point>;
@@ -205,7 +220,7 @@ private:
 typedef enum {
     ORIENTATION_CLOCKWISE = 0,
     ORIENTATION_COUNTERCLOCKWISE = 1,
-    ORIENTATION_UNKNOWN = 2
+    ORIENTATION_UNKNOWN = 2 // ex: colinear vectors
 } SegmentOrientation;
 
 /**
