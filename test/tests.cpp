@@ -30,7 +30,7 @@ TEST(TestPoint, TestMultiplicationByScalar)
     EXPECT_EQ(p3.y, 2.0);
 }
 
-TEST(TestPoint, TestConvexCombinarion)
+TEST(TestPoint, TestConvexCombination)
 {
     Point p1{2.0, 2.0};
     Point p2{6.0, 8.0};
