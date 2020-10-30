@@ -63,6 +63,23 @@ TEST(TestPoint, TestCrossProduct)
     EXPECT_EQ(cprod, -18.0);
 }
 
+TEST(TestPoint, TestIntersect)
+{
+    Point p1{1.0, 1.0};
+    Point p2{4.0, 4.0};
+    Point p3{1.0, 3.0};
+    Point p4{4.0, 1.0};
+
+    EXPECT_EQ(intersect2D(p1, p2, p3, p4), true);
+
+    Point p5{1.0, 1.0};
+    Point p6{1.0, 8.0};
+    Point p7{2.0, 1.0};
+    Point p8{2.0, 8.0};
+
+    EXPECT_EQ(intersect2D(p5, p6, p7, p8), false);
+}
+
 TEST(TestPoint, TestDistance2d)
 {
     Point p1{0.0, 0.0};
@@ -151,7 +168,7 @@ TEST(TestConvexHull, TestQuickHullManual)
 
     // verify the side for every point of segment pa[2], P2
     EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[0]), ORIENTATION_COUNTERCLOCKWISE);
-    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[1]), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[1]), ORIENTATION_UNKNOWN);
     EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[3]), ORIENTATION_COUNTERCLOCKWISE);
     EXPECT_EQ(determineOrientation2D(pa[2], P2, pa[4]), ORIENTATION_CLOCKWISE);
 

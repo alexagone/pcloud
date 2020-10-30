@@ -176,16 +176,45 @@ double distanceToLine2D(const Point& P1, const Point& P2, const Point& C)
     return num / det;
 }
 
-double getSegmentAngle(const Point& p0, const Point& p1)
+bool intersect2D(const Point& P1, const Point& P2, const Point& P3, const Point& P4)
 {
+    auto onSegment = [](const Point& P1, const Point& P2, const Point& P0)
+    {
+        if ( ((min(P1.x, P2.x) <= P0.x) && (max(P1.x, P2.x) >= P0.x)) &&
+             ((min(P1.y, P2.y) <= P0.y) && (max(P1.y, P2.y) >= P0.y)) ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
 
-    auto p = p1 - p0;
+    auto d1 = crossProduct(P4, P1, P3);
+    auto d2 = crossProduct(P4, P2, P3);
+    auto d3 = crossProduct(P2, P3, P1);
+    auto d4 = crossProduct(P2, P4, P1);
 
-    if(p.y >= 0.0)
-        return atan2(p.y, p.x);
+
+    if( (((d1>0) && (d2<0)) || ((d1<0) && (d2>0))) &&
+        (((d3>0) && (d4<0)) || ((d3<0) && (d4>0))) ) {
+        return true;
+    }
+    else if( (d1 == 0) && onSegment(P3, P4, P1) ) {
+        return true;
+    }
+    else if( (d2 == 0) && onSegment(P3, P4, P2) ) {
+        return true;
+    }
+    else if( (d3 == 0) && onSegment(P1, P2, P3) ) {
+        return true;
+    } 
+    else if( (d4 == 0) && onSegment(P1, P2, P4) ) {
+        return true;
+    }
     else
-        return 2*pi() + atan2(p.y, p.x);
-    
+    {
+        return false;
+    }
 }
 
 class SortClockwise
@@ -246,9 +275,7 @@ typedef enum {
  */
 SegmentOrientation determineOrientation2D(const Point& P1, const Point& P2, const Point& P0)
 {
-    // double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
-    // double val = crossProduct(P0, P2, P1);
-    double val = crossProduct(P1, P2, P0);
+    double val = crossProduct(P0, P2, P1);
 
     if (val > 0)
         return ORIENTATION_CLOCKWISE;
