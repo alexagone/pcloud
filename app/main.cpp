@@ -12,19 +12,19 @@ using namespace std;
 int main()
 {
     cout << "*********************************************" << endl;
-    cout << "*            nailedit demo app              *" << endl;
+    cout << "*              pcloud demo app              *" << endl;
     cout << "*********************************************" << endl;
     cout << endl;
 
-    const string CLOUD_CSV_PATH = "/tmp/nailedit_cloud.csv";
-    const string HULL_CSV_PATH = "/tmp/nailedit_hull.csv";
+    const string CLOUD_CSV_PATH = "/tmp/pcloud_cloud.csv";
+    const string HULL_CSV_PATH = "/tmp/pcloud_hull.csv";
 
     cin >> noskipws; 
 
-    cout << "Enter number of nails to be inserted [3, ...)" << endl;
+    cout << "Enter number of points to be inserted [3, ...)" << endl;
     uint64_t nbPoints = 0;
     cin >> nbPoints;
-    cout << "Nb nails: " << nbPoints << endl << endl;
+    cout << "Nb points: " << nbPoints << endl << endl;
 
     auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>(nbPoints);
 

@@ -41,12 +41,24 @@ TEST(TestPoint, TestConvexCombination)
     EXPECT_EQ(p3.y, 5.0);
 }
 
-TEST(TestPoint, TestCrossProduct)
+TEST(TestPoint, TestCrossProductOrigin)
 {
     Point p1{2.0, 4.0};
     Point p2{8.0, 7.0};
 
     double cprod = crossProduct(p1, p2);
+
+    EXPECT_EQ(cprod, -18.0);
+}
+
+TEST(TestPoint, TestCrossProduct)
+{
+    Point p1{4.0, 6.0};
+    Point p2{10.0, 9.0};
+
+    Point p0{2.0, 2.0};
+
+    double cprod = crossProduct(p1, p2, p0);
 
     EXPECT_EQ(cprod, -18.0);
 }

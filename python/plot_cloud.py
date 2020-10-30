@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cloud', default="/tmp/nailedit_cloud.csv")
-    parser.add_argument('--hull', default="/tmp/nailedit_hull.csv")
+    parser.add_argument('--cloud', default="/tmp/pcloud_cloud.csv")
+    parser.add_argument('--hull', default="/tmp/pcloud_hull.csv")
 
     args = parser.parse_args()
 

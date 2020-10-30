@@ -9,7 +9,7 @@
 
 # Build
 
-    You can build nailed it using the following:
+    You can build pcloud it using the following:
 
         mkdir build
         cd build
@@ -18,7 +18,7 @@
 
     This will compile the application to the following location
 
-        build/src/nailedit
+        build/app/pcloud
 
     To compile in Release mode
 
@@ -47,19 +47,19 @@
 
     Tests can be run using:
 
-        ./build/test/nailedit_tests
+        ./build/test/tests
 
 
 # Runing the application
 
     Demo application can be run after a successful build using:
 
-        ./build/src/nailedit
+        ./build/app/pcloud
 
     This will generate two files that contain respectively the point cloud coordinates and convex hull estimated by the algorithm.
 
-        /tmp/nailedit_cloud.csv
-        /tmp/nailedit_hull.csv
+        /tmp/pcloud_cloud.csv
+        /tmp/pcloud_hull.csv
 
 
 # Point cloud visualization

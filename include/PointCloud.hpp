@@ -127,6 +127,18 @@ double crossProduct(const Point& P1, const Point& P2)
 {
     return (P1.x*P2.y) - (P2.x*P1.y);
 }
+
+/**
+ * Compute the cross product of two vector centered at (x0, y0)
+ *
+ *   det ((x1-x0, y1-y0), (x2-x0, y2-y0))
+ */
+
+double crossProduct(const Point& P1, const Point& P2, const Point& P0)
+{
+    return (P1.x-P0.x)*(P2.y-P0.y) - (P2.x-P0.x)*(P1.y-P0.y);
+}
+
 /**
  * A dynamically allocated contiguous array of Point
  */
@@ -234,7 +246,9 @@ typedef enum {
  */
 SegmentOrientation determineOrientation2D(const Point& P1, const Point& P2, const Point& P0)
 {
-    double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
+    // double val = (P0.x-P1.x)*(P2.y-P1.y) - (P0.y-P1.y)*(P2.x-P1.x);
+    // double val = crossProduct(P0, P2, P1);
+    double val = crossProduct(P1, P2, P0);
 
     if (val > 0)
         return ORIENTATION_CLOCKWISE;
@@ -543,7 +557,9 @@ private:
         {
             _hull.push_back(pa[p]);
 
-            q = (p+1)%n;  
+            // selecting the next point
+            q = (p+1)%n;
+
             for(uint64_t i = 0; i < n; ++i)
             {
                 if(determineOrientation2D(pa[p], pa[i], pa[q]) == ORIENTATION_COUNTERCLOCKWISE)
@@ -556,16 +572,6 @@ private:
         _sortClockWise();
 
         return _hull;
-    }
-
-    int _orientation(const Point& p, const Point& q, const Point& r)
-    {
-        int val = (q.y-p.y)*(r.x-q.x) - (q.x-p.x)*(r.y-q.y);
-
-        if(val == 0)
-            return 0;
-
-        return (val > 0) ? 1 : 2;
     }
 
     void _sortClockWise(void)
