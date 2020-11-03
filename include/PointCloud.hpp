@@ -346,54 +346,21 @@ typedef vector<CloudModeParams> CloudModeArray;
 class PointCloudInitializerUniform : public PointCloudInitializer
 {
 public:
-#if 0
-    PointCloudInitializerUniformN(CloudModeArray& modes) : _mt((random_device())()), _modes(modes)
+
+    PointCloudInitializerUniform(CloudModeArray modes) : _mt((random_device())()), _modes(modes)
     {
         for(const auto& m : _modes) {
             _M += m.M;
         }
     }
-#endif
 
     PointCloudInitializerUniform(CloudModeParams cp=CloudModeParams()) : _mt((random_device())()), _modes{cp}
     {
-        if(_modes[0].M == 0) {
+
+        _M = _modes[0].M;
+
+        if(_M == 0) {
             throw runtime_error("error, specified number to generate point cloud cannot be 0");
-        }
-    }
-
-    virtual inline uint64_t len(void)
-    {
-        return _modes[0].M;
-    }
-
-    virtual inline void gen(Point& p)
-    {
-        p.x = _modes[0].distx(_mt); p.y = _modes[0].disty(_mt);
-    }
-
-private:
-
-    mt19937 _mt;
-    CloudModeArray _modes;
-
-#if 0
-    uint64_t _M = 0;
-    uint64_t _index = 0;
-    uint64_t _current = 0;
-    uint64_t _count = 0;
-#endif
-};
-
-#if 0
-class PointCloudInitializerUniformN : public PointCloudInitializer
-{
-public:
-
-    PointCloudInitializerUniformN(CloudModeArray& modes) : _mt((random_device())()), _modes(modes)
-    {
-        for(const auto& m : _modes) {
-            _M += m.M;
         }
     }
 
@@ -418,6 +385,7 @@ public:
 
         ++_count;
     }
+
 private:
 
     mt19937 _mt;
@@ -428,7 +396,6 @@ private:
     uint64_t _current = 0;
     uint64_t _count = 0;
 };
-#endif
 
 /**
  * Main point cloud class that encapsulate memory management, containement,
@@ -441,6 +408,13 @@ public:
      * shared pointer type definition
      */ 
     typedef shared_ptr<PointCloud> PointCloudPtr;
+
+    template <typename Init>
+    static PointCloudPtr CreatePointCloud(CloudModeArray modes)
+    {
+        Init init(modes);
+        return make_shared<PointCloud>(init);
+    }
 
     /**
      * Factory method to create a new point cloud using specified initializer

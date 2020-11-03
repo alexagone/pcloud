@@ -26,7 +26,15 @@ int main()
     cin >> nbPoints;
     cout << "Nb points: " << nbPoints << endl << endl;
 
-    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>();
+    auto carray = CloudModeArray
+    {
+        CloudModeParams(nbPoints, 0.0, 0.25, 0.0, 0.25),
+        CloudModeParams(nbPoints, 0.25, 0.4, 0.25, 0.6),
+        CloudModeParams(nbPoints, 0.4, 0.70, 0.6, 0.8),
+        CloudModeParams(nbPoints, 0.7, 1.0, 0.8, 1.0),
+    };
+
+    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>(carray);
 
     auto fcloud = ofstream(CLOUD_CSV_PATH);
     pc->write(fcloud);
