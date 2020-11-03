@@ -301,12 +301,8 @@ public:
 
 };
 
-/**
- * PointCloud initialization algorithm using uniform distribution
- */
-class PointCloudInitializerUniform : public PointCloudInitializer
+struct CloudModeParams
 {
-public:
 
     constexpr static const uint64_t DEFAULT_M = 100;
     constexpr static const double DEFAULT_XMIN = 0.0;
@@ -314,24 +310,74 @@ public:
     constexpr static const double DEFAULT_YMIN = 0.0;
     constexpr static const double DEFAULT_YMAX = 1.0;
 
-    PointCloudInitializerUniform(
-        const uint64_t M=DEFAULT_M,
-        const double xmin=DEFAULT_XMIN,
-        const double xmax=DEFAULT_XMAX,
-        const double ymin=DEFAULT_YMIN,
-        const double ymax=DEFAULT_YMAX
+    const uint64_t M;
+    const double xmin;
+    const double xmax;
+    const double ymin;
+    const double ymax;
+
+    uniform_real_distribution<> distx;
+    uniform_real_distribution<> disty;
+
+    CloudModeParams(
+        const uint64_t M = DEFAULT_M,
+        const double xmin = DEFAULT_XMIN,
+        const double xmax = DEFAULT_XMAX,
+        const double ymin = DEFAULT_YMIN,
+        const double ymax = DEFAULT_YMAX
     ) :
-        _M(M),
-        _xmin(xmin),
-        _xmax(xmax),
-        _ymin(ymin),
-        _ymax(ymax),
-        _mt((random_device())()),
-        _distx(_xmin, _xmax),
-        _disty(_ymin, _ymax)
+        M(M),
+        xmin(xmin),
+        xmax(xmax),
+        ymin(ymin),
+        ymax(ymax),
+        distx(xmin, xmax),
+        disty(ymin, ymax)
+    {}
+
+};
+
+typedef vector<CloudModeParams> CloudModeArray;
+
+
+/**
+ * PointCloud initialization algorithm using uniform distribution
+ */
+class PointCloudInitializerUniform : public PointCloudInitializer
+{
+public:
+
+    PointCloudInitializerUniform(CloudModeParams& cp) : _cp(cp), _mt((random_device())())
     {
-        if(_M == 0) {
+        if(_cp.M == 0) {
             throw runtime_error("error, specified number to generate point cloud cannot be 0");
+        }
+    }
+
+    virtual inline uint64_t len(void)
+    {
+        return _cp.M;
+    }
+
+    virtual inline void gen(Point& p)
+    {
+        p.x = _cp.distx(_mt); p.y = _cp.disty(_mt);
+    }
+
+private:
+    CloudModeParams& _cp;
+
+    mt19937 _mt;
+};
+
+class PointCloudInitializerUniformN : public PointCloudInitializer
+{
+public:
+
+    PointCloudInitializerUniformN(CloudModeArray& modes) : _mt((random_device())()), _modes(modes)
+    {
+        for(const auto& m : _modes) {
+            _M += m.M;
         }
     }
 
@@ -342,21 +388,30 @@ public:
 
     virtual inline void gen(Point& p)
     {
-        p.x = _distx(_mt); p.y = _disty(_mt);
-    }
+        if(_count >= _modes[_index].M) {
+            _count = 0;
 
+            ++_index; 
+            if(_index >= _modes.size()) {
+                throw runtime_error("Error, mode index larger than the current number of modes");
+            }
+        }
+
+        p.x = _modes[_index].distx(_mt);
+        p.y = _modes[_index].disty(_mt);
+
+        ++_count;
+    }
 private:
-    const uint64_t _M;
-    const double _xmin;
-    const double _xmax;
-    const double _ymin;
-    const double _ymax;
 
     mt19937 _mt;
-    uniform_real_distribution<> _distx;
-    uniform_real_distribution<> _disty;
-};
+    CloudModeArray _modes;
 
+    uint64_t _M = 0;
+    uint64_t _index = 0;
+    uint64_t _current = 0;
+    uint64_t _count = 0;
+};
 
 /**
  * Main point cloud class that encapsulate memory management, containement,
@@ -374,14 +429,9 @@ public:
      * Factory method to create a new point cloud using specified initializer
      */
     template <typename Init>
-    static PointCloudPtr CreatePointCloud(
-        const uint64_t M=100,
-        const double xmin=0.0,
-        const double xmax=1.0,
-        const double ymin=0.0,
-        const double ymax=1.0)
+    static PointCloudPtr CreatePointCloud(CloudModeParams cp=CloudModeParams())
     {
-        Init init(M); 
+        Init init(cp);
         return make_shared<PointCloud>(init);
     }
 

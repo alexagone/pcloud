@@ -26,7 +26,7 @@ int main()
     cin >> nbPoints;
     cout << "Nb points: " << nbPoints << endl << endl;
 
-    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>(nbPoints);
+    auto pc = PointCloud::CreatePointCloud<PointCloudInitializerUniform>();
 
     auto fcloud = ofstream(CLOUD_CSV_PATH);
     pc->write(fcloud);
