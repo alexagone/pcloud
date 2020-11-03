@@ -346,30 +346,46 @@ typedef vector<CloudModeParams> CloudModeArray;
 class PointCloudInitializerUniform : public PointCloudInitializer
 {
 public:
-
-    PointCloudInitializerUniform(CloudModeParams& cp) : _cp(cp), _mt((random_device())())
+#if 0
+    PointCloudInitializerUniformN(CloudModeArray& modes) : _mt((random_device())()), _modes(modes)
     {
-        if(_cp.M == 0) {
+        for(const auto& m : _modes) {
+            _M += m.M;
+        }
+    }
+#endif
+
+    PointCloudInitializerUniform(CloudModeParams cp=CloudModeParams()) : _mt((random_device())()), _modes{cp}
+    {
+        if(_modes[0].M == 0) {
             throw runtime_error("error, specified number to generate point cloud cannot be 0");
         }
     }
 
     virtual inline uint64_t len(void)
     {
-        return _cp.M;
+        return _modes[0].M;
     }
 
     virtual inline void gen(Point& p)
     {
-        p.x = _cp.distx(_mt); p.y = _cp.disty(_mt);
+        p.x = _modes[0].distx(_mt); p.y = _modes[0].disty(_mt);
     }
 
 private:
-    CloudModeParams& _cp;
 
     mt19937 _mt;
+    CloudModeArray _modes;
+
+#if 0
+    uint64_t _M = 0;
+    uint64_t _index = 0;
+    uint64_t _current = 0;
+    uint64_t _count = 0;
+#endif
 };
 
+#if 0
 class PointCloudInitializerUniformN : public PointCloudInitializer
 {
 public:
@@ -412,6 +428,7 @@ private:
     uint64_t _current = 0;
     uint64_t _count = 0;
 };
+#endif
 
 /**
  * Main point cloud class that encapsulate memory management, containement,
