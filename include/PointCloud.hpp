@@ -493,8 +493,6 @@ public:
 
     QuickHull() : _hull() {}
 
-    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
-
     inline uint64_t getXminIndex(void) { return _xmin; }
     inline uint64_t getXmaxIndex(void) { return _xmax; }
 
@@ -596,8 +594,6 @@ public:
 
     GiftWrapping() : _hull() {}
 
-    PointArray operator()(PointCloud::PointCloudPtr& points) { return _process(points); }
-
     inline uint64_t getXminIndex(void) { return _xmin; }
 
 private:
@@ -651,6 +647,15 @@ private:
     PointArray _hull;
 
     uint64_t _xmin = 0;
+};
+
+/**
+ * GrahamScan
+ */
+class GrahamScan : public ConvexHullAlgo
+{
+public:
+
 };
 
 /**
