@@ -102,14 +102,14 @@ TEST(TestPoint, TestSegmentOrientation)
     Point p1{0.0, 4.0};
     Point p2{4.0, 0.0};
 
-    Point pleft{1.0, 1.0};
-    Point pright{3.0, 3.0};
+    Point p3{1.0, 1.0};
+    Point p4{3.0, 3.0};
 
-    EXPECT_EQ(determineOrientation2D(p2, p1, pleft), ORIENTATION_COUNTERCLOCKWISE);
-    EXPECT_EQ(determineOrientation2D(p2, p1, pright), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p1, p2, p3), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p1, p2, p4), ORIENTATION_COUNTERCLOCKWISE);
 
-    EXPECT_EQ(determineOrientation2D(p1, p2, pright), ORIENTATION_COUNTERCLOCKWISE);
-    EXPECT_EQ(determineOrientation2D(p1, p2, pleft), ORIENTATION_CLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p1, p2, p4), ORIENTATION_COUNTERCLOCKWISE);
+    EXPECT_EQ(determineOrientation2D(p1, p2, p3), ORIENTATION_CLOCKWISE);
 }
 
 TEST(TestPointCloud, TestInitialization)
