@@ -41,21 +41,24 @@ int main()
 
     cout << "Writing generated point cloud in " << CLOUD_CSV_PATH << endl;
 
-    array<function<ConvexHull::ConvexHullPtr(PointCloud::PointCloudPtr)>, 2> arr = 
+    array<function<ConvexHull::ConvexHullPtr(PointCloud::PointCloudPtr)>, 3> arr = 
     {
         ConvexHull::CreateConvexHull<QuickHull>,
-        ConvexHull::CreateConvexHull<GiftWrapping>
+        ConvexHull::CreateConvexHull<GiftWrapping>,
+        ConvexHull::CreateConvexHull<GrahamScan>
     };
 
     cout << "Enter algorithm selection:" << endl;
     cout << "0: QuickHull" << endl;
     cout << "1: GiftWrapping" << endl;
+    cout << "2: GrahamScan" << endl;
+
     uint64_t algo = 0;
     cin.clear();
     cin.ignore();
     cin >> algo;
    
-    if(algo > 1)
+    if(algo > 2)
         throw runtime_error("Algo cannot be larger than 1");
     
     // auto hull = ConvexHull::CreateConvexHull<QuickHull>(pc);

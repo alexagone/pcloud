@@ -8,6 +8,7 @@
 #include <iostream>
 #include <cinttypes>
 #include <algorithm>
+#include <cassert>
 
 using namespace std;
 
@@ -551,7 +552,7 @@ private:
         PointArray pa = points->getPointArray();
 
         uint64_t i = 0;
-        auto minmax = [this, &i, pa](Point& p)
+        auto x_minmax = [this, &i, pa](Point& p)
         {
             if(p.x < pa[_xmin].x) {
                 _xmin = i;
@@ -562,7 +563,7 @@ private:
             ++i;
         };
 
-        for_each(pa.begin(), pa.end(), minmax);
+        for_each(pa.begin(), pa.end(), x_minmax);
 
         // process recursively each side of the segment created by xmin, xmax
         _processRecurse(pa, pa[_xmin], pa[_xmax], ORIENTATION_CLOCKWISE);
@@ -622,8 +623,7 @@ private:
     {
         copy(_hull.begin(), _hull.end(), back_inserter(_hullSorted));
 
-        SortPolarCoord sortPolarCoord(_hullSorted);
-        sort(_hullSorted.begin(), _hullSorted.end(), sortPolarCoord);
+        sort(_hullSorted.begin(), _hullSorted.end(), SortPolarCoord(_hullSorted));
     }
 
     PointSet _hull;
@@ -653,7 +653,7 @@ private:
         PointArray pa = points->getPointArray();
 
         uint64_t i = 0;
-        auto minmax = [this, &i, pa](Point& p)
+        auto x_min = [this, &i, pa](Point& p)
         {
             if(p.x < pa[_xmin].x) {
                 _xmin = i;
@@ -661,7 +661,7 @@ private:
             ++i;
         };
 
-        for_each(pa.begin(), pa.end(), minmax);
+        for_each(pa.begin(), pa.end(), x_min);
 
         uint64_t n = pa.size();
         uint64_t p = _xmin, q;
@@ -688,8 +688,7 @@ private:
 
     void _sortClockWise(void)
     {
-        SortPolarCoord sortPolarCoord(_hull);
-        sort(_hull.begin(), _hull.end(), sortPolarCoord);
+        sort(_hull.begin(), _hull.end(), SortPolarCoord(_hull));
     }
 
     PointArray _hull;
@@ -717,7 +716,7 @@ private:
         PointArray pa = points->getPointArray();
 
         uint64_t i = 0;
-        auto minmax = [this, &i, pa](Point& p)
+        auto y_min = [this, &i, pa](Point& p)
         {
             if(p.x < pa[_ymin].x) {
                 _ymin = i;
@@ -725,11 +724,18 @@ private:
             ++i;
         };
 
-        for_each(pa.begin(), pa.end(), minmax);
+        // Find minimum over y axis
+        for_each(pa.begin(), pa.end(), y_min);
 
+        // Use the back inserter to populate the PointArray data structure
+        copy(pa.begin(), pa.end(), back_inserter(_hull));
 
-        SortPolarCoord sortPolarCoord = SortPolarCoord(pa[_ymin]);
-        sort(_hull.begin(), _hull.end(), sortPolarCoord);
+        // Sort counter clockwise points in reference to the y minimum location
+        sort(_hull.begin(), _hull.end(), SortPolarCoord(pa[_ymin]));
+
+        // Populate the stack, considering all points except minimum over the y axis
+        std::stack<Point> hull_stack(std::deque<Point>(_hull.begin(), _hull.end()-1));
+
 
         return _hull;
     }
