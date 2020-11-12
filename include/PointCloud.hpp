@@ -1,12 +1,13 @@
 #pragma once
 
+#include <set>
+#include <stack>
+#include <random>
+#include <vector>
+#include <memory>
 #include <iostream>
 #include <cinttypes>
-#include <vector>
-#include <set>
 #include <algorithm>
-#include <random>
-#include <memory>
 
 using namespace std;
 
@@ -49,6 +50,46 @@ struct Point
     bool operator>(const Point& p) const
     {
         return x > p.x;
+    }
+
+    Point& operator+=(const Point& p)
+    {
+        x += p.x;
+        y += p.y;
+
+        return *this;
+    }
+
+    Point& operator-=(const Point& p)
+    {
+        x -= p.x;
+        y -= p.y;
+
+        return *this;
+    }
+
+    Point& operator*=(const Point& p)
+    {
+        x *= p.x;
+        y *= p.y;
+
+        return *this;
+    }
+
+    Point& operator*=(const double s)
+    {
+        x *= s;
+        y *= s;
+
+        return *this;  
+    }
+
+    Point& operator/=(const double s)
+    {
+        x /= s;
+        y /= s;
+
+        return *this;
     }
 
     double x;
@@ -145,6 +186,11 @@ double crossProduct(const Point& P1, const Point& P2, const Point& P0)
 using PointArray = vector<Point>;
 
 /**
+ * LIFO data structure for Points
+ */
+using PointStack = stack<Point>;
+
+/**
  * An ordered set of Point
  */
 using PointSet = set<Point>;
@@ -217,25 +263,27 @@ bool intersect2D(const Point& P1, const Point& P2, const Point& P3, const Point&
     }
 }
 
-class SortClockwise
+class SortPolarCoord
 {
 public:
-    SortClockwise(PointArray& pa) : _center{0.0, 0.0}
+
+    SortPolarCoord(PointArray& pa) : _origin{0.0, 0.0}
     {
         // compute the center position of the provided PointArray
         for(auto& p : pa) {
-            _center.x += p.x;
-            _center.y += p.y;
+            _origin += p;
         }
 
-        _center.x /= (double)pa.size();
-        _center.y /= (double)pa.size();
+        _origin.x /= (double)pa.size();
+        _origin.y /= (double)pa.size();
     }
+
+    SortPolarCoord(Point& origin) : _origin(origin) {}
 
     bool operator()(const Point& r, const Point& l)
     {
-        rr = r - _center;
-        ll = l - _center;
+        rr = r - _origin;
+        ll = l - _origin;
 
         return _get_angle(rr) > _get_angle(ll);
     }
@@ -250,7 +298,7 @@ private:
             return 2*pi() + atan2(p.y, p.x);
     }
 
-    Point _center;
+    Point _origin;
     Point rr;
     Point ll;
 };
@@ -574,8 +622,8 @@ private:
     {
         copy(_hull.begin(), _hull.end(), back_inserter(_hullSorted));
 
-        SortClockwise sortClockwise(_hullSorted);
-        sort(_hullSorted.begin(), _hullSorted.end(), sortClockwise);
+        SortPolarCoord sortPolarCoord(_hullSorted);
+        sort(_hullSorted.begin(), _hullSorted.end(), sortPolarCoord);
     }
 
     PointSet _hull;
@@ -640,8 +688,8 @@ private:
 
     void _sortClockWise(void)
     {
-        SortClockwise sortClockwise(_hull);
-        sort(_hull.begin(), _hull.end(), sortClockwise);
+        SortPolarCoord sortPolarCoord(_hull);
+        sort(_hull.begin(), _hull.end(), sortPolarCoord);
     }
 
     PointArray _hull;
@@ -656,6 +704,39 @@ class GrahamScan : public ConvexHullAlgo
 {
 public:
 
+    GrahamScan() : _hull() {}
+
+    inline uint64_t getYminIndex(void) { return _ymin; }
+
+private:
+
+    virtual PointArray _process(PointCloud::PointCloudPtr& points)
+    {
+        _hull.clear();
+
+        PointArray pa = points->getPointArray();
+
+        uint64_t i = 0;
+        auto minmax = [this, &i, pa](Point& p)
+        {
+            if(p.x < pa[_ymin].x) {
+                _ymin = i;
+            }
+            ++i;
+        };
+
+        for_each(pa.begin(), pa.end(), minmax);
+
+
+        SortPolarCoord sortPolarCoord = SortPolarCoord(pa[_ymin]);
+        sort(_hull.begin(), _hull.end(), sortPolarCoord);
+
+        return _hull;
+    }
+
+    PointArray _hull;
+
+    uint64_t _ymin = 0;
 };
 
 /**
